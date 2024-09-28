@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stone Paper Scissors Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Garamond&display=swap" rel="stylesheet">
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Garamond', serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: url('https://www.transparenttextures.com/patterns/pattern.png');
+            background-color: #f7f2e7;
+            overflow: hidden;
+            padding: 20px;
+            color: #333;
+        }
+
+        .game-container {
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid #d8a054;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 30px;
+            color: #8a5d3b;
+            text-shadow: 1px 1px 2px #fff;
+            border-bottom: 2px solid #d8a054;
+            padding-bottom: 10px;
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            font-size: 1.5rem;
+            color: #8a5d3b;
+        }
+
+        .scoreboard div {
+            padding: 10px 20px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .choices {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .choice {
+            width: 120px;
+            height: 120px;
+            background-color: rgba(220, 220, 220, 0.8);
+            color: #5d4c2f;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 1;
+            border: 2px solid #d8a054;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .choice:hover {
+            transform: scale(1.1);
+        }
+
+        #result {
+            margin-top: 30px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #8a5d3b;
+            text-shadow: 1px 1px 2px #fff;
+        }
+
+        .button {
+            padding: 12px 30px;
+            background-color: #d8a054;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .button:hover {
+            background-color: #b3882f;
+            transform: translateY(-5px);
+        }
+
+        .button:active {
+            transform: translateY(2px);
+        }
+
+        .ethnic-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/wood.png');
+            opacity: 0.1;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="ethnic-pattern"></div>
+
+    <div class="game-container">
+        <h1>Stone Paper Scissors</h1>
+        <div class="scoreboard">
+            <div>Player: <span id="player-score">0</span></div>
+            <div>Computer: <span id="computer-score">0</span></div>
+        </div>
+        <div class="choices">
+            <div class="choice" id="stone">🪨 Stone</div>
+            <div class="choice" id="paper">📄 Paper</div>
+            <div class="choice" id="scissors">✂️ Scissors</div>
+        </div>
+        <div id="result"></div>
+        <button class="button" id="reset" disabled>Play Again</button>
+    </div>
+
+    <script>
+        const choices = document.querySelectorAll('.choice');
+        const result = document.getElementById('result');
+        const resetButton = document.getElementById('reset');
+        const playerScoreElem = document.getElementById('player-score');
+        const computerScoreElem = document.getElementById('computer-score');
+
+        const choicesArray = ['stone', 'paper', 'scissors'];
+        let playerScore = 0;
+        let computerScore = 0;
+        let roundsPlayed = 0;
+        const maxRounds = 5;
+
+        // Event listener for player's choice
+        choices.forEach(choice => {
+            choice.addEventListener('click', () => {
+                if (roundsPlayed < maxRounds) {
+                    const playerChoice = choice.id;
+                    const computerChoice = getComputerChoice();
+                    determineWinner(playerChoice, computerChoice);
+                    roundsPlayed++;
+
+                    // Check if game over
+                    if (roundsPlayed === maxRounds) {
+                        displayFinalWinner();
+                    }
+                }
+            });
+        });
+
+        // Get random choice for computer
+        function getComputerChoice() {
+            const randomIndex = Math.floor(Math.random() * 3);
+            return choicesArray[randomIndex];
+        }
+
+        // Determine winner of the round
+        function determineWinner(playerChoice, computerChoice) {
+            if (playerChoice === computerChoice) {
+                result.textContent = `It's a tie! You both chose ${playerChoice}.`;
+            } else if (
+                (playerChoice === 'stone' && computerChoice === 'scissors') ||
+                (playerChoice === 'paper' && computerChoice === 'stone') ||
+                (playerChoice === 'scissors' && computerChoice === 'paper')
+            ) {
+                result.textContent = `You win! ${playerChoice} beats ${computerChoice}.`;
+                playerScore++;
+                playerScoreElem.textContent = playerScore;
+            } else {
+                result.textContent = `You lose! ${computerChoice} beats ${playerChoice}.`;
+                computerScore++;
+                computerScoreElem.textContent = computerScore;
+            }
+        }
+
+        // Display final winner after max rounds
+        function displayFinalWinner() {
+            if (playerScore > computerScore) {
+                result.textContent = `Congratulations! You won the game ${playerScore} - ${computerScore}.`;
+            } else if (computerScore > playerScore) {
+                result.textContent = `Game Over! Computer wins ${computerScore} - ${playerScore}.`;
+            } else {
+                result.textContent = `It's a draw! ${playerScore} - ${computerScore}.`;
+            }
+            resetButton.disabled = false;
+        }
+
+        // Reset game
+        resetButton.addEventListener('click', () => {
+            playerScore = 0;
+            computerScore = 0;
+            roundsPlayed = 0;
+            playerScoreElem.textContent = '0';
+            computerScoreElem.textContent = '0';
+            result.textContent = '';
+            resetButton.disabled = true;
+        });
+    </script>
+</body>
+</html>
